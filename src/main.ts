@@ -1092,10 +1092,13 @@ export default class RayNotesPlugin extends Plugin {
         event.stopPropagation();
         return;
       }
-      if ((event.metaKey || event.ctrlKey) && !event.altKey && !event.shiftKey && event.code === "KeyF") {
+      const hasPrimaryModifier = IS_MACOS ? event.metaKey : event.ctrlKey;
+      if (hasPrimaryModifier && !event.altKey && !event.shiftKey && event.code === "KeyF") {
         this.hideInlineProperties(context);
       }
-      if (!(event.metaKey || event.ctrlKey)) return;
+      const isDeleteShortcut = event.ctrlKey && !event.metaKey && !event.altKey
+        && !event.shiftKey && event.code === "KeyX";
+      if (!hasPrimaryModifier && !isDeleteShortcut) return;
       const key = event.key.toLowerCase();
       const code = event.code;
       const run = (action: () => void): void => {
@@ -1105,7 +1108,7 @@ export default class RayNotesPlugin extends Plugin {
         action();
       };
 
-      if (event.ctrlKey && !event.metaKey && !event.altKey && !event.shiftKey && code === "KeyX") {
+      if (isDeleteShortcut) {
         run(() => void this.deleteCurrentNote());
       } else if (event.altKey && !event.shiftKey && code === "Comma") {
         run(() => this.toggleFormatBar());
