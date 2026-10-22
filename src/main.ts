@@ -1360,13 +1360,13 @@ export default class RayNotesPlugin extends Plugin {
     if (!app.isVimEnabled?.() || !(context.leaf.view instanceof MarkdownView)) return false;
     const view = context.leaf.view as MarkdownView & {
       sourceMode?: {
-        cmEditor?: { cm?: { cm?: { state?: { vim?: { insertMode?: boolean; overwrite?: boolean } } } } };
+        cmEditor?: { cm?: { cm?: { state?: { vim?: { insertMode?: boolean; overwrite?: boolean; visualMode?: boolean } } } } };
       };
     };
     if (!view.editor.hasFocus()) return false;
     const vim = view.sourceMode?.cmEditor?.cm?.cm?.state?.vim;
     // Let native Vim handle Esc if its internal state is unavailable.
-    return !vim || typeof vim.insertMode !== "boolean" || vim.insertMode || vim.overwrite === true;
+    return !vim || typeof vim.insertMode !== "boolean" || vim.insertMode || vim.overwrite === true || vim.visualMode === true;
   }
 
   private hasOpenOverlay(doc: Document): boolean {

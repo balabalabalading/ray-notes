@@ -23,7 +23,7 @@ const Adapter = runInNewContext(transpileModule(`class Adapter { ${adapterSource
 function escape(options: {
   vimEditing?: boolean;
   vimEnabled?: boolean;
-  vimState?: { insertMode?: boolean; overwrite?: boolean } | null;
+  vimState?: { insertMode?: boolean; overwrite?: boolean; visualMode?: boolean } | null;
   editorFocused?: boolean;
   overlay?: boolean;
   composing?: boolean;
@@ -111,4 +111,16 @@ test("native Vim overwrite and unavailable state safely retain Escape", () => {
 test("Vim editing does not retain Escape when the editor lacks focus", () => {
   const { calls } = escape({ vimEditing: true, editorFocused: false });
   assert.deepEqual(calls, ["hide"]);
+});
+
+
+test("Vim Visual Escape reaches the native editor instead of hiding the window", () => {
+  const { calls, event } = escape({
+    vimEnabled: true,
+    vimState: { insertMode: false, overwrite: false, visualMode: true }
+  });
+  assert.deepEqual(calls, []);
+  assert.equal(event.defaultPrevented, false);
+  assert.equal(event.stopped, false);
+  assert.equal(event.immediateStopped, false);
 });
